@@ -1,0 +1,7 @@
+tqdm
+numpy
+scikit-learn
+pandas
+scipy
+ipython
+pymorphy2
