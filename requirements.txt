@@ -3,5 +3,7 @@ numpy
 scikit-learn
 pandas
 scipy
-ipython
+jupyter
 pymorphy2
+nltk
+Flask
