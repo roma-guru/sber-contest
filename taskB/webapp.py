@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, request
 app = Flask(__name__)
 
 import nltk
@@ -11,7 +11,7 @@ m = MorphAnalyzer()
 template = """
 <html>
 <head>
-    <title>Вопрос {{ i }} | Задача B</title>
+    <title>Пример {{ i }} | Задача B</title>
     <style>
         body {
             color: #e5dfc5;
@@ -24,6 +24,12 @@ template = """
             color: #b48375;
         }
     </style>
+    <script>
+        document.onkeydown = e => { 
+            if (e.key==' ') 
+                window.location='/?i={{ next }}'
+        }
+    </script>
 </head>
 <body>
     {% autoescape false %}
@@ -37,12 +43,17 @@ template = """
 """
 
 @app.route("/")
-def taskB():
-    i = randint(0, len(df))
+def main():
+    i = request.args.get('i')
+    if i:
+        i = int(i)
+    else:
+        i = randint(0, len(df))
     answer = df.answer[i].lower().strip(' ').strip('.')
     question = df.question[i].strip(' ').strip('?')
     text = highlight(df.paragraph[i], question, answer)
-    return render_template_string(template, i=i, paragraph=text, question=df.question[i], answer=answer)
+    next = randint(0, len(df))
+    return render_template_string(template, i=i, next=next, paragraph=text, question=df.question[i], answer=answer)
 
 def wrap_tag(text, word, open_tag, close_tag):
     return text.replace(word, '{1}{0}{2}'.format(word, open_tag, close_tag))
