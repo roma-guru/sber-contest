@@ -14,15 +14,14 @@ template = """
     <title>Вопрос {{ i }} | Задача B</title>
     <style>
         body {
-            color: #ddd;
-            background-color: #222;
+            color: #e5dfc5;
+            background-color: #252120;
         }
         .quest-word {
-            color: red;
+            color: #a92f41;
         }
         .answer-sent {
-            background-color: yellow;
-            color: grey;
+            color: #b48375;
         }
     </style>
 </head>
