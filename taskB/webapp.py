@@ -6,7 +6,7 @@ import pandas as pd
 df = pd.read_csv('../train_task_b.csv')
 from random import randint
 from pymorphy2.analyzer import MorphAnalyzer
-morph = MorphAnalyzer()
+m = MorphAnalyzer()
 
 template = """
 <html>
@@ -61,10 +61,12 @@ def highlight(text, question, answer):
     sent = sent.lower()
     # TODO:here morphy
     sent = wrap_tag(sent, answer, '<b>', '</b>')
-    q_words = nltk.wordpunct_tokenize(question)
+    q_words = nltk.wordpunct_tokenize(question.lower())
     for w in q_words:
+        # Skip too short words
         if len(w)<3: continue
-        sent = wrap_tag(sent, w, '<span class=\'quest-word\'>', '</span>')
+        morph_res = str(m.tag(w)[0])
+        sent = wrap_tag(sent, w, '<span class=\'quest-word\'>', '({})</span>'.format(morph_res))
     sent = '<span class=\'answer-sent\'>{}</span>'.format(sent)
     text = text.replace(orig, sent)
     return text
