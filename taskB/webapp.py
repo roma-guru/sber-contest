@@ -12,6 +12,19 @@ template = """
 <html>
 <head>
     <title>Вопрос {{ i }} | Задача B</title>
+    <style>
+        body {
+            color: #ddd;
+            background-color: #222;
+        }
+        .quest-word {
+            color: red;
+        }
+        .answer-sent {
+            background-color: yellow;
+            color: grey;
+        }
+    </style>
 </head>
 <body>
     {% autoescape false %}
@@ -20,7 +33,7 @@ template = """
     <hr>
     <p>{{ question }}</p>
     <hr>
-    <p>{{ answer }}</p>
+    <p><b>{{ answer }}</b></p>
 </body>
 """
 
@@ -51,8 +64,8 @@ def highlight(text, question, answer):
     q_words = nltk.wordpunct_tokenize(question)
     for w in q_words:
         if len(w)<3: continue
-        sent = wrap_tag(sent, w, '<span style=\'color:red\'>', '</span>')
-    sent = '<span style=\'background-color:yellow\'>{}</span>'.format(sent)
+        sent = wrap_tag(sent, w, '<span class=\'quest-word\'>', '</span>')
+    sent = '<span class=\'answer-sent\'>{}</span>'.format(sent)
     text = text.replace(orig, sent)
     return text
 
