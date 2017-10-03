@@ -34,11 +34,11 @@ template = """
 <body>
     {% autoescape false %}
     <p>{{ paragraph }}</p>
-    {% endautoescape %}
     <hr>
     <p>{{ question }}</p>
     <hr>
     <p><b>{{ answer }}</b></p>
+    {% endautoescape %}
 </body>
 """
 
@@ -51,9 +51,11 @@ def main():
         i = randint(0, len(df))
     answer = df.answer[i].lower().strip(' ').strip('.')
     question = df.question[i].strip(' ').strip('?')
-    text = highlight(df.paragraph[i], question, answer)
+    text,question,answer = highlight(df.paragraph[i], question, answer)
     next = randint(0, len(df))
-    return render_template_string(template, i=i, next=next, paragraph=text, question=df.question[i], answer=answer)
+    return render_template_string(template, i=i, next=next, 
+                                  paragraph=text, question=question,
+                                  answer=answer)
 
 def wrap_tag(text, word, open_tag, close_tag):
     return text.replace(word, '{1}{0}{2}'.format(word, open_tag, close_tag))
@@ -79,7 +81,9 @@ def highlight(text, question, answer):
         sent = wrap_tag(sent, w, '<span class=\'quest-word\'>', '({})</span>'.format(morph_res))
     sent = '<span class=\'answer-sent\'>{}</span>'.format(sent)
     text = text.replace(orig, sent)
-    return text
+    question = wrap_tag(question, q_words[0].capitalize(), '<b>', '</b>')
+    question = wrap_tag(question, q_words[0], '<b>', '</b>')
+    return (text, question, answer)
 
 if __name__=='__main__':
-    app.run(port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
