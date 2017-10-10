@@ -1,28 +1,10 @@
 import nltk
 import sys
 from pymorphy2 import MorphAnalyzer
+from russian_tagsets import converters
 
 m = MorphAnalyzer()
-pos_oc2ud = {
-    None: 'PUNCT',
-    'NOUN': 'NOUN',
-    'ADJF': 'ADJ',
-    'ADJS': 'ADJ',
-    'VERB': 'VERB',
-    'COMP': 'ADV',
-    'INFN': 'VERB',
-    'PRTF': 'VERB',
-    'PRTS': 'VERB',
-    'GRND': 'VERB',
-    'NUMR': 'NUM',
-    'ADVB': 'ADV',
-    'NPRO': 'PRON',
-    'PRED': 'ADV',
-    'PREP': 'ADP',
-    'CONJ': 'CCONJ',
-    'PRCL': 'PART',
-    'INTJ': 'INTJ'
-}
+oc2ud = converters.converter('opencorpora-int','ud20')
 
 
 if __name__=='__main__':
@@ -38,7 +20,8 @@ if __name__=='__main__':
         print("# text: {}".format(s))
         for j,t in enumerate(tokens):
             t = m.parse(t)[0]
-            print("{0}\t{1}\t{2}\t{3}\t_\t_\t_\t_\t_\t_".format(j+1, t.word, 
-                                                       t.normal_form, 
-                                                       pos_oc2ud[t.tag.POS]))
+            pos, feats = oc2ud(str(t.tag)).split(' ')
+            print("{0}\t{1}\t{2}\t{3}\t_\t{4}\t_\t_\t_\t_".format(j+1, t.word, 
+                                                       t.normal_form, pos,
+                                                        feats))
         print()
