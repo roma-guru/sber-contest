@@ -4,7 +4,7 @@ from tqdm import tqdm
 import scipy.sparse
 import sys
 
-f = open(r"warandpeace", "r")
+f = open(r"warandpeace.utf8", "r")
 s = f.read().split()
 
 
@@ -34,7 +34,7 @@ current_number = item_to_num_dict[current_word]
 
 
 for i in range(20):
-    probs_for_current = prob[current_number]
+    probs_for_current = prob[current_number].toarray()[0]
     max_arg = np.argmax(probs_for_current)
     
     current_word = num_to_item_dict[max_arg]
