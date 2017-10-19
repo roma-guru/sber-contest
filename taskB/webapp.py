@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 import nltk
 import pandas as pd
-df = pd.read_csv('../train_task_b.csv')
+df = pd.read_csv('train_task_b.csv')
 from random import randint
 
 from pymorphy2.analyzer import MorphAnalyzer
@@ -104,7 +104,7 @@ class MaltParser:
         print("Ready!")
         return self.process_output(result_text)
 
-def to_visjs(sentence):
+def to_visjs(sentence, q_words=[], a_words=[]):
     """
     Перевод формата списка словарей в формат VisJS.
     Возвращает JSON - узлы + ребра.
@@ -116,12 +116,21 @@ def to_visjs(sentence):
         id = int(token_line["id"])
         par_id = int(token_line["par"])
         deprel = token_line["deprel"]
+        is_root = deprel in ('ROOT', 'root')
         if par_id:
             edges.append({"from": id, "to": par_id, "label": deprel})
         word = token_line["token"]
         pos = token_line["pos"]
         label = "{} ({})".format(word, pos)
-        nodes.append({"id": id, "label": label})
+        node = {"id": id, "label": label}
+        if len(word)>=3 and word in a_words:
+            node['color'] = '#33ff33'
+        if len(word)>=3 and word in q_words:
+            node['color'] = '#ffff33'
+        if is_root:
+            node['color'] = '#ff6699'
+        if pos not in ('PUNCT',): 
+            nodes.append(node)
     return dumps(nodes, ensure_ascii=False), dumps(edges, ensure_ascii=False)
 
 @app.route("/")
@@ -143,7 +152,9 @@ def main():
 
     text = df.paragraph[i]
     answer = df.answer[i].strip(' ').strip('.')
+    a_words = nltk.word_tokenize(answer)
     question = df.question[i].strip(' ')
+    q_words = nltk.word_tokenize(question)
     # Найдем предложение с ответом
     answer_sent = find_answer_sent(text, answer)
     parser_result = malt_parser.parse("{} {}".format(answer_sent, question))
@@ -151,8 +162,8 @@ def main():
     # Подсветим нужные части
     text,question,answer = highlight(text, question, answer_sent, answer)
     # Генерим узлы графа
-    q_nodes, q_edges = to_visjs(parser_result[-1])
-    s_nodes, s_edges = to_visjs(parser_result[0])
+    q_nodes, q_edges = to_visjs(parser_result[-1], q_words, a_words)
+    s_nodes, s_edges = to_visjs(parser_result[0], q_words, a_words)
 
     finish = time.perf_counter()
     ping = round(finish - start, 2)
