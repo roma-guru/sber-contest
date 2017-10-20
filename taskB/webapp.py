@@ -11,6 +11,10 @@ from pymorphy2.analyzer import MorphAnalyzer
 from russian_tagsets import converters
 m = MorphAnalyzer()
 
+import pickle
+with open('russian.pickle', 'rb') as p:
+    sent_tokenizer = pickle.load(p)
+
 class MaltParser:
     """
     Обертка для парсера.
@@ -34,7 +38,7 @@ class MaltParser:
         """
         Преобразование текста в формат CONLLU.
         """
-        sents = nltk.sent_tokenize(txt)
+        sents = sent_tokenizer.sentences_from_text(txt)
         out_text = []
         m = self.pymorphy_analyzer
         for i,s in enumerate(sents):
